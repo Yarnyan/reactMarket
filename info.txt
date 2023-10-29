@@ -1,0 +1,160 @@
+/\getOrderInfo/\
+
+date,
+orderId,
+название покупки
+инструкция
+
+/\Вывод средств/\
+
+POST
+userId,
+address,
+value
+
+/\История арбитража/\
+
+
+TotalPage
+userName,
+sellerName,
+status(отклонено или нет)
+date
+
+/\Purchase history/\
+
+
+Totalpage,
+название + количество(то есть Ключи для сталкрафта 5)
+дата
+статус(accept, conflect, wait accept)
+сумма
+userName
+
+/\Status/\
+
+
+totalPage,
+название(reject, added)
+дата,
+название товара
+
+/\Order history/\
+
+
+date, 
+totalPage,
+айди заказа, 
+сколько айтемов(1 или 2 или 3...)
+название айтемов(боты x1 пиво x2)
+статус(confirm, reject)
+итоговая цена
+
+*********seller****************
+
+/\GetItems/\
+
+shopId,
+название,
+цена,
+категория 
+продажи
+наличие
+
+/\getItemAdd/\
+
+категории дай мне тут ради бога
+
+/\itemAdd/\
+
+POST
+
+shopId,
+name,
+photo,
+description,
+цена,
+инструкция, 
+категория
+
+/\editItem/\
+
+PUT
+
+shopId,
+name,
+photo,
+description,
+цена,
+инструкция, 
+категория
+
+/\getItemEdit/\
+
+категории дай мне тут ради бога
+
+/\getSetting/\
+***настройки магазина***
+
+name,
+photo,
+описание
+
+*************МАГАЗИН**********************
+
+/\getHome/\
+
+photo
+categories
+название
+рейтинг
+арбитражи
+покупки 
+количество оценок
+описание
+
+/\getReviews/\
+тут наверное лучше два запроса сделать, подумай(надо получить общую статистику, и сами отзывы)
+ratingString
+rating
+allReviews
+Quality
+Professionalism
+Cost
+Contactability
+Timeline
+
+***отзывы***
+
+header: 
+mode: 2 - все отзывы, 0 - негативные, 1 - положительные 
+
+name
+date
+description
+productName
+rating
+isTruncated: true,
+
+
+/\getStoreCategory/\
+
+category
+img
+name
+
+
+/\getItemsShop/\
+
+itemId
+img
+name
+price
+
+/\корзина/\
+
+POST
+
+метод оплаты
+itemId
+quantity
