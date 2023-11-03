@@ -92,7 +92,7 @@ export default function StoreMain() {
               <h1 className="store__content-subtitle">{category}</h1>
               <div className="store__content-items">
                 {groupedItems[category].map((item) => (
-                  <Link to={`/shop/${shopId}/store/${item.name}`} className="store__item" key={item.id}>
+                  <Link to={`/shop/${shopId}/store/${item.id}`} className="store__item" key={item.id}>
                     <div className="store__item-image">
                       <img src={item.imageUrl} alt="" />
                     </div>

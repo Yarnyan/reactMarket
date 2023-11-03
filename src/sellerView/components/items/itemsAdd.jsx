@@ -73,7 +73,7 @@ export default function ItemsAdd() {
                 formData.append('price', itemPrice);
                 formData.append('instructions', itemInstruction);
                 formData.append('category', itemCategory);
-                console.log(itemName, selectedFile, selectedFile2, itemPrice, itemInstruction, itemCategory);
+                console.log(itemName, selectedFile, selectedFile2, parseFloat(itemPrice), itemInstruction, itemCategory);
                 clearInput()
                 await postNewItem(formData, shopId)
             }

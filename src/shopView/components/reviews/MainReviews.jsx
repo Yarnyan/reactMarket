@@ -86,31 +86,35 @@ export default function MainReviews() {
     filterAndSplitItems();
   }, [newItem]);
   const renderStars = rating => {
-    if (Number.isInteger(rating)) {
-      const stars = [];
-      const k = 5 - rating;
-      for (let i = 0; i < rating; i++) {
-        stars.push(<AiFillStar key={`filled_${i}`} className='star' />);
+    if (rating != null) { 
+      if (Number.isInteger(rating)) {
+        const stars = [];
+        const k = 5 - rating;
+        for (let i = 0; i < rating; i++) {
+          stars.push(<AiFillStar key={`filled_${i}`} className='star' />);
+        }
+        for (let i = 0; i < k; i++) {
+          stars.push(<AiOutlineStar key={`empty_${i}`} className='star' />);
+        }
+        return stars;
+      } else {
+        const stars = [];
+        var firstDigit = rating.toString().charAt(0);
+        for (let i = 0; i < firstDigit; i++) {
+          stars.push(<BsStarFill key={`filled_${i}`} className='star' />);
+        }
+        stars.push(<BsStarHalf className='star' />);
+        const remainingStars = 5 - stars.length;
+        for (let i = 0; i < remainingStars; i++) {
+          stars.push(<BsStar key={`empty_${i}`} className='star' />);
+        }
+        return stars;
       }
-      for (let i = 0; i < k; i++) {
-        stars.push(<AiOutlineStar key={`empty_${i}`} className='star' />);
-      }
-      return stars;
     } else {
-      const stars = [];
-      var firstDigit = rating.toString().charAt(0);
-      for (let i = 0; i < firstDigit; i++) {
-        stars.push(<BsStarFill key={`filled_${i}`} className='star' />);
-      }
-      stars.push(<BsStarHalf className='star' />);
-      const remainingStars = 5 - stars.length;
-      for (let i = 0; i < remainingStars; i++) {
-        stars.push(<BsStar key={`empty_${i}`} className='star' />);
-      }
-
-      return stars;
+      return null; // Обработайте случай, когда рейтинг не определен или равен null
     }
   };
+  
 
   useEffect(() => {
     const selectReviewsBtn = document.querySelectorAll('.btn');
@@ -178,10 +182,11 @@ export default function MainReviews() {
     });
   };
   const truncateString = (text, maxLength) => {
-    if (text.length <= maxLength) {
+    if (typeof text === 'string' && text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    } else {
       return text;
     }
-    return text.substring(0, maxLength) + '...';
   };
   const theme = createTheme({
     palette: {

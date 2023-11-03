@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiLink = 'https://ef50-31-28-113-222.ngrok-free.app/api/'
+const apiLink = 'https://d7eb-31-28-113-222.ngrok-free.app/api/'
 const b = sessionStorage.getItem('auth-token')
 
 async function GET(link, params) {
@@ -28,6 +28,7 @@ const POST = async (link, data) => {
               'Access-Control-Allow-Origin': '*'
           }
       });
+      console.log(response)
       return response;
   } catch (error) {
       return error;
@@ -44,6 +45,10 @@ export async function buyProducts(currency, formData) {
 
 export function getCategory() {
   return GET('Category/getCategories')
+} //good
+
+export async function getShop(shopId) {
+  return await GET(`shop/getById`, "id=" + shopId)
 } //good
 
 export async function getProducts(shopId, category) {

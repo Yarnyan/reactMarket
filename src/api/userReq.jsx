@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiLink = 'https://ef50-31-28-113-222.ngrok-free.app/api/Wallet/'
+const apiLink = 'https://d7eb-31-28-113-222.ngrok-free.app/api/Wallet/'
 const b = sessionStorage.getItem('auth-token')
 const POST = async (link, data) => {
     try {
@@ -13,20 +13,24 @@ const POST = async (link, data) => {
         });
         return response.data;
     } catch (error) {
-        console.error(error);
+        return error
     }
 }
 
 async function GET(link, params) {
     let с = params === undefined ? '' : '?' + params;
-    let a = await axios.get(apiLink + link + с, {
-        headers: {
-          'auth-token': b,
-          'ngrok-skip-browser-warning': 'any',
-          'Access-Control-Allow-Origin': '*'
-        }
-      })
-    return a.data;
+    try {
+        let a = await axios.get(apiLink + link + с, {
+            headers: {
+              'auth-token': b,
+              'ngrok-skip-browser-warning': 'any',
+              'Access-Control-Allow-Origin': '*'
+            }
+          })
+        return a.data;
+    } catch (error) {
+        return error
+    }
   }
 
 export function getMainUser() {

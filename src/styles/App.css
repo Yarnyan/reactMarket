@@ -262,6 +262,7 @@ body {
 
 .main__description-title {
     margin-top: 15px;
+    word-wrap: break-word;
     font-size: 16px;
 }
 
@@ -281,6 +282,7 @@ body {
 
 .shopPage__main-category {
     width: 100%;
+    margin-top: 20px;
 }
 
 .shopPage__main-category h1 {
@@ -290,7 +292,7 @@ body {
 
 .main__category-items {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     margin-top: 10px;
     flex-wrap: wrap;
@@ -311,6 +313,9 @@ body {
     color: #8378f5;
 }
 
+.main__category-item:not(:first-child):not(:nth-child(4n)) {
+    margin-left: 15px;
+}
 
 .shopPage__footer {
     min-height: 70px;
@@ -1531,7 +1536,7 @@ user */
 
 .setting__container {
     width: 100%;
-    overflow: scroll;
+    /* overflow: scroll; */
     max-height: calc(100vh - 59px - 10px);
     position: relative;
     padding: 10px 0 10px 0;

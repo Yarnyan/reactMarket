@@ -1,51 +1,89 @@
 import axios from 'axios'
 
-const apiLink = 'https://ef50-31-28-113-222.ngrok-free.app/'
-
-const POST = async (link, data) => {
-    try {
-        const response = await axios.post('https://jsonplaceholder.typicode.com/posts', data, {
-          headers: {
-              'authKey': '',
-              'ngrok-skip-browser-warning': '',
-              'Access-Control-Allow-Origin': '*'
-            }
-        });
-        console.log(response.data);
-      } catch (error) {
-        // console.error(error);
+const apiLink = 'https://d7eb-31-28-113-222.ngrok-free.app/api'
+const b = sessionStorage.getItem('auth-token')
+const POST = async (link, params, data) => {
+  let c = params === undefined ? ' ' : '?' + params;
+  try {
+    const response = await axios.post(apiLink + link + c, data, {
+      headers: {
+        'auth-token': b,
+        'ngrok-skip-browser-warning': 'any',
+        'Access-Control-Allow-Origin': '*'
       }
+    });
+    return response.data
+  } catch (error) {
+    return error
+  }
 }
 
 const PUT = async (link, params, data) => {
+  let c = params === undefined ? ' ' : '?' + params;
   try {
-    const response = await axios.put('https://jsonplaceholder.typicode.com/posts' + link + '?' + params, data, {
+    const response = await axios.put(apiLink + link + c, data, {
       headers: {
-          'authKey': '',
-          'ngrok-skip-browser-warning': '',
-          'Access-Control-Allow-Origin': '*'
-        }
+        'auth-token': b,
+        'ngrok-skip-browser-warning': 'any',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
-    console.log(response.data);
+    return response.data
   } catch (error) {
-    console.error(error);
+    return error
   }
 }
 
 async function GET(link, params) {
-  let a = await axios.get(apiLink + link + '?' + params, {
+  let c = params === undefined ? ' ' : '?' + params;
+  try {
+    let a = await axios.get(apiLink + link + '?' + params, {
       headers: {
-        'authKey': '',
-        'ngrok-skip-browser-warning': '',
+        'auth-token': b,
+        'ngrok-skip-browser-warning': 'any',
         'Access-Control-Allow-Origin': '*'
       }
     })
-  console.log(a.data)
-  return a.data;
+    return a.data;
+  } catch (error) {
+    return error
+  }
 }
 
+async function DELETE(link, params) {
+  let c = params === undefined ? ' ' : '?' + params;
+  try {
+    let a = await axios.delete(apiLink + link + '?' + params, {
+      headers: {
+        'auth-token': b,
+        'ngrok-skip-browser-warning': 'any',
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+  } catch (error) {
+    return error
+  }
+}
+
+export function updateSetting(formData) {
+  return PUT('/Shop/update', undefined, formData)
+} //good
+
+export function addItem(formData) {
+  return POST('/Product/addProduct', undefined, formData)
+} //good
+
+export function deleteItem(productId) {
+  return DELETE('Product/removeProduct', 'categoryId=' + productId)
+}
+
+export async function getShop(shopId) {
+  return await GET(`/Shop/getById`, "id=" + shopId)
+} //good
+
+// /ne testil
 export function putSetting(formData, shopId) {
-    return PUT('updateSetting', 'shopId=' + shopId, formData)
+  return PUT('updateSetting', 'shopId=' + shopId, formData)
 }  //good
 
 export function getItemsHistory(type, page, shopId) {
@@ -60,9 +98,9 @@ export function postNewItem(formData, shopId) {
   return POST('addNewItem', 'shopId=' + shopId, formData)
 } //good 
 
-export function putItem (formData, shopId) {
+export function putItem(formData, shopId) {
   return PUT('updateItem', 'shopId=' + shopId, formData)
-} 
+}
 
 export function getItems(shopId) {
   return GET('sellerItems', 'shopId=' + shopId)

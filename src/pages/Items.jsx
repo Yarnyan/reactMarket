@@ -6,7 +6,7 @@ export default function Items() {
   return (
     <div>
       <MainItems />
-      <FooterItems />
+      <FooterItems currentPage="store"/>
     </div>
   );
 }

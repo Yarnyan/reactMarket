@@ -5,21 +5,22 @@ import { AiFillStar } from 'react-icons/ai';
 import { MdOutlineLocalGroceryStore } from 'react-icons/md';
 import { RiScales3Fill } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
-
-import { getHome } from '../../../api/shopReq'
+import LoadingModal from '../../../userView/components/ui/loadingModal';
+import { getShop } from '../../../api/shopReq'
 
 
 export default function Main() {
     const [data, setData] = useState(null);
     const [newItem, setNewItem] = useState(null);
     const [isTruncated, setIsTruncated] = useState(true);
-
+    const [isTrueLoader, setIsTrueLoader] = useState(false)
     let { shopId } = useParams();
 
     useEffect(() => {
         const fetchData = async () => {
           try {
-            setNewItem((await getHome(shopId)))
+            setNewItem((await getShop(shopId)))
+            setIsTrueLoader(true)
           } catch (error) {
             console.error(error);
           }
@@ -28,31 +29,13 @@ export default function Main() {
         fetchData();
       }, []);
 
-    useEffect(() => {
-        if (1 > 0) {
-            const newItem = {
-                id: 1, //data.id
-                name: 'test', //data.subtitle
-                rating: 'test', //data.rating
-                quantity: 'test', //data.quantity
-                shopping: 'test', //data.shoping
-                arbitration: 'test', //data.arbitration
-                description:
-                    'test     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi g elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.g elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi g elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi.     Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus nam quo quod, vitae sint cupiditate, sunt voluptatem modi illo voluptas excepturi. Aliquam, architecto! Non, veritatis minima in quasi aperiam modi...',
-                img: image, //data.img
-                items: ['test', 'test', 'test'],
-            };
-            setNewItem(newItem);
-        }
-    }, [data]);
-
     const toggleTruncate = () => {
         setIsTruncated(!isTruncated);
     };
 
     return (
         <main className="shopPage__main">
-            {newItem && (
+            {newItem && newItem.description && (
                 <div>
                     <div className="shopPage__main-prev" key={newItem.id}>
                         <img src={image} alt="" />
@@ -98,7 +81,7 @@ export default function Main() {
                     <div className="shopPage__main-category">
                         <h1>Categories</h1>
                         <div className="main__category-items">
-                            {newItem.items.map((item, index) => (
+                            {newItem.categories.map((item, index) => (
                                 <div className="main__category-item" key={index}>
                                     {item}
                                 </div>
@@ -107,6 +90,9 @@ export default function Main() {
                     </div>
                 </div>
             )}
+                  <div className={isTrueLoader === false ? 'loadingModal__container active' : 'loadingModal__container'}>
+        <LoadingModal />
+      </div>
         </main>
     );
 }

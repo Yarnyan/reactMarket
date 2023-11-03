@@ -3,17 +3,19 @@ import BackBtn from '../../../shopView/components/ui/Button/BackButton'
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoIcon from '@mui/icons-material/Photo';
-import { putSetting } from '../../../api/sellerReq'
+import { updateSetting } from '../../../api/sellerReq'
 import { Alert } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
-import {getSetting} from '../../../api/sellerReq'
+import { getShop } from '../../../api/sellerReq'
 import { useParams } from 'react-router-dom';
+import LoadingModal from '../../../userView/components/ui/loadingModal';
 export default function SettingMain() {
     let { shopId } = useParams();
     const [selectedFile, setSelectedFile] = useState(null);
     const [storeName, setStoreName] = useState('');
     const [storeDescription, setStoreDescription] = useState('');
+    const [isTrueLoader, setIsTrueLoader] = useState(false)
     const [alertType, setAlertType] = useState(false)
     useEffect(() => {
         const textareas = document.querySelectorAll('textarea');
@@ -37,17 +39,28 @@ export default function SettingMain() {
         };
         input.click();
     };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getShop(shopId)
+                setStoreName(res.name)
+                setStoreDescription(res.description)
+                setSelectedFile(res.imageURL)
+                setIsTrueLoader(true)
+            } catch (error) {
+                return error
+            }
+        }
+        fetchData()
+    }, []);
     const handleSaveSettings = async () => {
         try {
             showAndHideAlert()
-            setStoreName('')
-            setStoreDescription('')
-            setSelectedFile(null)
             const formData = new FormData();
             formData.append('name', storeName);
-            formData.append('image', selectedFile);
             formData.append('description', storeDescription);
-            await putSetting(formData, shopId)
+            formData.append('image', selectedFile);
+            await updateSetting(formData);
         } catch (error) {
             console.error(error);
         }
@@ -67,16 +80,16 @@ export default function SettingMain() {
             },
         },
     });
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                await getSetting(shopId)
-            } catch(e) {
-                console.log(e)
-            }
-        }
-        fetchSettings()
-    }, []);
+    // useEffect(() => {
+    //     const fetchSettings = async () => {
+    //         try {
+    //             await getSetting(shopId)
+    //         } catch(e) {
+    //             console.log(e)
+    //         }
+    //     }
+    //     fetchSettings()
+    // }, []);
     return (
         <div className='setting__container'>
             <BackBtn />
@@ -86,29 +99,26 @@ export default function SettingMain() {
             <div className='setting__tools-body'>
                 <div className='setting__container-tools'>
                     <div className='setting__tools-name ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter store name..." value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+                            <textarea type="text" placeholder="Enter store name..." value={storeName || ''} onChange={(e) => setStoreName(e.target.value)} />
                             <div className="input__search">
                                 <StorefrontIcon />
                             </div>
                         </div>
                     </div>
-                    <div className='setting__tools-file ll'>
-                        {/* <p>Name</p> */}
+                    <div className='setting__tools-description ll'>
                         <div className='input'>
-                            <textarea type="text" placeholder="Add a store photo..." value={selectedFile ? selectedFile.name : ''} onClick={handleFileInput} />
+                            <textarea type="text" placeholder="Enter a description for the store..." value={storeDescription || ''} onChange={(e) => setStoreDescription(e.target.value)} />
                             <div className="input__search">
-                                <PhotoIcon />
+                                <DescriptionIcon />
                             </div>
                         </div>
                     </div>
-                    <div className='setting__tools-description ll'>
-                        {/* <p>Name</p> */}
+                    <div className='setting__tools-file ll'>
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter a description for the store..." value={storeDescription} onChange={(e) => setStoreDescription(e.target.value)} />
+                            <textarea type="text" placeholder="Add a store photo..." value={selectedFile ? selectedFile.name : ''} onClick={handleFileInput} readOnly/>
                             <div className="input__search">
-                                <DescriptionIcon />
+                                <PhotoIcon />
                             </div>
                         </div>
                     </div>
@@ -121,6 +131,9 @@ export default function SettingMain() {
                         Settings successfully changed!
                     </Alert>
                 </ThemeProvider>
+            </div>
+            <div className={isTrueLoader === false ? 'loadingModal__container active' : 'loadingModal__container'}>
+                <LoadingModal />
             </div>
         </div>
     )

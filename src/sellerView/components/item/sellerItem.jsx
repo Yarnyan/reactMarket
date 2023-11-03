@@ -5,6 +5,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoIcon from '@mui/icons-material/Photo';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import {putItem} from '../../../api/sellerReq'
+import {deleteItem} from '../../../api/sellerReq'
 import { Alert } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
@@ -61,8 +62,9 @@ export default function SellerItem() {
             console.error(error);
         }
     };
-    const deleteItem = async () => {
+    const removeItem = async () => {
         try {
+            await deleteItem()
             showAndHideAlertDelete()
         } catch(error) {
             console.error(error);
@@ -164,7 +166,7 @@ export default function SellerItem() {
             </div>
             <div className='save__container'>
                 <button onClick={(() => handleSaveSettings())} style={{width: '40%'}}>Save change</button>
-                <button onClick={(() => deleteItem())} style={{width: '40%'}}>Delete item</button>
+                <button onClick={(() => removeItem())} style={{width: '40%'}}>Delete item</button>
                 <ThemeProvider theme={theme}>
                     <Alert severity="success" color="info" className={`sendMain__alert-true ${alertType ? 'active' : ''}`}>
                         {alertMessage}
