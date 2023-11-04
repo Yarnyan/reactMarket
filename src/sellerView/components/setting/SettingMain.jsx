@@ -45,7 +45,6 @@ export default function SettingMain() {
                 const res = await getShop(shopId)
                 setStoreName(res.name)
                 setStoreDescription(res.description)
-                setSelectedFile(res.imageURL)
                 setIsTrueLoader(true)
             } catch (error) {
                 return error
@@ -59,8 +58,13 @@ export default function SettingMain() {
             const formData = new FormData();
             formData.append('name', storeName);
             formData.append('description', storeDescription);
-            formData.append('image', selectedFile);
-            await updateSetting(formData);
+            if(selectedFile != null) {
+                formData.append('image', selectedFile);
+                await updateSetting(formData);
+            } else {
+                formData.append('image', selectedFile || undefined);
+                await updateSetting(formData);
+            }
         } catch (error) {
             console.error(error);
         }

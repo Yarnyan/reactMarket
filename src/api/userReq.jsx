@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiLink = 'https://d7eb-31-28-113-222.ngrok-free.app/api/Wallet/'
+const apiLink = 'https://7a5c-31-28-113-222.ngrok-free.app/api/Wallet/'
 const b = sessionStorage.getItem('auth-token')
 const POST = async (link, data) => {
     try {

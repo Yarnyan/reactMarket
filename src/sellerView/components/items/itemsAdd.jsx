@@ -1,54 +1,56 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import BackBtn from '../../../shopView/components/ui/Button/BackButton'
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoIcon from '@mui/icons-material/Photo';
-import {postNewItem} from '../../../api/sellerReq'
+import { postNewItem } from '../../../api/sellerReq'
+import { getCategory } from '../../../api/shopReq'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Alert } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
+import LoadingModal from '../../../userView/components/ui/loadingModal'
+import { Dropdown } from 'primereact/dropdown';
 export default function ItemsAdd() {
-    let { shopId} = useParams()
+    let { shopId } = useParams()
     const [selectedFile, setSelectedFile] = useState(null);
-    const [selectedFile2, setSelectedFile2] = useState(null);
+    const [itemDesciption, setItemDesciption] = useState('');
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
+    const [categoryData, setCategoryData] = useState([]);
     const [itemInstruction, setItemInstruction] = useState('');
     const [itemCategory, setItemCategory] = useState('');
+    const [allItems, setAllItems] = useState([])
     const [alertType, setAlertType] = useState(false)
     const [alertErrorType, setAlertErrorType] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [isTrueLoader, setIsTrueLoader] = useState(false)
     useEffect(() => {
         const textareas = document.querySelectorAll('textarea');
         textareas.forEach(textarea => {
-          textarea.addEventListener('input', () => {
-            textarea.style.height = 'auto';
-            textarea.style.height = `${textarea.scrollHeight}px`;
-    
-            const inputSearch = textarea.nextElementSibling;
-            inputSearch.style.height = `${textarea.scrollHeight}px`;
-          });
+            textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = `${textarea.scrollHeight}px`;
+
+                const inputSearch = textarea.nextElementSibling;
+                inputSearch.style.height = `${textarea.scrollHeight}px`;
+            });
         });
-      }, []);
-      const handleFileInput = (id) => {
+    }, []);
+    const handleFileInput = (id) => {
         const input = document.createElement('input');
         input.type = 'file';
-      
         input.onchange = (event) => {
-          const file = event.target.files[0];
-          if(id === 1) {
+            const file = event.target.files[0];
             setSelectedFile(file);
-          } else {
-            setSelectedFile2(file);
-          }
         };
         input.click();
-      };
+    };
     const clearInput = () => {
         setItemName('');
         setSelectedFile(null);
-        setSelectedFile2(null);
+        setItemDesciption('');
         setItemPrice('')
         setItemInstruction('');
         setItemCategory('');
@@ -63,21 +65,20 @@ export default function ItemsAdd() {
         try {
             const formData = new FormData();
             const newPrice = parseFloat(itemPrice)
-            if(itemName === '' || selectedFile === null || selectedFile2 === null || itemPrice === '' || itemInstruction === '') {
+            if (itemName === '' || selectedFile === null || itemDesciption === '' || itemPrice === '' || itemInstruction === '') {
                 showAndHideErrorAlert()
             } else {
                 showAndHideAlert()
                 formData.append('name', itemName);
                 formData.append('image', selectedFile);
-                formData.append('description', selectedFile2);
+                formData.append('description', itemDesciption);
                 formData.append('price', itemPrice);
                 formData.append('instructions', itemInstruction);
-                formData.append('category', itemCategory);
-                console.log(itemName, selectedFile, selectedFile2, parseFloat(itemPrice), itemInstruction, itemCategory);
+                // formData.append('category', selectedCategoryId);
                 clearInput()
                 await postNewItem(formData, shopId)
             }
-        } catch(error) {
+        } catch (error) {
             console.error(error);
         }
     };
@@ -96,8 +97,22 @@ export default function ItemsAdd() {
             setAlertType(false)
         }, 2000);
     };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getCategory()
+                const categoryNames = response.map((category) => category.name);
+                setCategoryData(categoryNames);
+                setAllItems(response)
+                setIsTrueLoader(true)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        fetchData()
+    }, []);
     return (
-        <div className='setting__container'>
+        <div className='setting__container' style={{ overflow: isTrueLoader ? 'scroll' : '' }}>
             <BackBtn />
             <div className='setting__subtitle'>
                 <h1>Add item</h1>
@@ -105,58 +120,57 @@ export default function ItemsAdd() {
             <div className='setting__tools-body'>
                 <div className='setting__container-tools'>
                     <div className='setting__tools-name ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter item name..." value={itemName} onChange={(e) => setItemName(e.target.value)}/>
+                            <textarea type="text" placeholder="Enter item name..." value={itemName} onChange={(e) => setItemName(e.target.value)} />
                             <div className="input__search">
                                 <StorefrontIcon />
                             </div>
                         </div>
                     </div>
                     <div className='setting__tools-file ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Add a store photo..."  value={selectedFile ? selectedFile.name : ''} onClick={() => handleFileInput(1)}/>
+                            <textarea type="text" placeholder="Add a store photo..." value={selectedFile ? selectedFile.name : ''} onClick={() => handleFileInput(1)} />
                             <div className="input__search">
                                 <PhotoIcon />
                             </div>
                         </div>
                     </div>
+
                     <div className='setting__tools-description ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter item name description..." value={selectedFile2 ? selectedFile2.name : ''} onClick={() => handleFileInput(2)}/>
+                            <textarea type="text" placeholder="Enter item name description..." value={itemDesciption} onChange={(e) => setItemDesciption(e.target.value)} />
                             <div className="input__search">
                                 <DescriptionIcon />
                             </div>
                         </div>
                     </div>
                     <div className='setting__tools-price ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter the cost of the item..." value={itemPrice} onChange={(e) => setItemPrice(e.target.value)}/>
+                            <textarea type="text" placeholder="Enter the cost of the item..." value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
                             <div className="input__search">
                                 <AttachMoneyIcon />
                             </div>
                         </div>
                     </div>
                     <div className='setting__tools-price ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter the instructions..." value={itemInstruction} onChange={(e) => setItemInstruction(e.target.value)}/>
+                            <textarea type="text" placeholder="Enter the instructions..." value={itemInstruction} onChange={(e) => setItemInstruction(e.target.value)} />
                             <div className="input__search">
                                 <DescriptionIcon />
                             </div>
                         </div>
                     </div>
                     <div className='setting__tools-price ll'>
-                        {/* <p>Name</p> */}
                         <div className='input'>
-                            <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                                <option>213</option>
-                                <option>123</option>
-                                <option>321</option>
-                            </select>
+                            <Dropdown
+                                value={selectedCategory}
+                                options={categoryData}
+                                placeholder="Select a category"
+                                onChange={(e) => {
+                                    setSelectedCategory(e.value);
+                                  }}
+                                className="w-full"
+                            />
                             <div className="input__search">
                                 <DescriptionIcon />
                             </div>
@@ -174,7 +188,10 @@ export default function ItemsAdd() {
                         Please fill in all fields!
                     </Alert>
                 </ThemeProvider>
-            </div>    
+            </div>
+            <div className={isTrueLoader === false ? 'loadingModal__container active' : 'loadingModal__container'}>
+                <LoadingModal />
+            </div>
         </div>
     )
 }

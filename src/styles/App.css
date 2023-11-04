@@ -2632,3 +2632,28 @@ user */
     color: #fff;
     font-size: 14px;
 }
+
+/* addItem */
+
+.w-full {
+    position: relative;
+    height: 50px;
+    font-size: 14px;
+    padding: 10px;
+    color: gray;
+    background-color: #141516;
+    border-radius: 0 12px 12px 0;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+}
+
+.p-dropdown-item {
+    background-color: #141516;
+    padding: 10px;
+    color: #fff;
+}
+
+.p-dropdown-items {
+    max-height: 100px;
+}
