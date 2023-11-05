@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiLink = 'https://7a5c-31-28-113-222.ngrok-free.app/api/'
+const apiLink = 'https://a15a-31-28-113-222.ngrok-free.app/api/'
 const b = sessionStorage.getItem('auth-token')
 
 async function GET(link, params) {
@@ -36,7 +36,7 @@ const POST = async (link, data) => {
 }
 
 export function AddShop(formData, shopName, shopDescription) {
-  return POST(`create`, "name=" + shopName + "&description=" + shopDescription, formData)
+  return POST(`createShop`, "name=" + shopName + "&description=" + shopDescription, formData)
 } //good
 
 export async function buyProducts(currency, formData) {
@@ -48,7 +48,7 @@ export function getCategory() {
 } //good
 
 export async function getShop(shopId) {
-  return await GET(`shop/getById`, "id=" + shopId)
+  return await GET(`shop/getShopById`, "id=" + shopId)
 } //good
 
 export async function getProducts(shopId, category) {

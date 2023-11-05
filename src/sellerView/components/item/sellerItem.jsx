@@ -4,22 +4,31 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoIcon from '@mui/icons-material/Photo';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import {putItem} from '../../../api/sellerReq'
+import { updateItem } from '../../../api/sellerReq'
 import {deleteItem} from '../../../api/sellerReq'
 import { Alert } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
+import { Dropdown } from 'primereact/dropdown';
+import { getCategory } from '../../../api/shopReq'
+import LoadingModal from '../../../userView/components/ui/loadingModal'
 export default function SellerItem() {
     let { shopId} = useParams()
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedFile2, setSelectedFile2] = useState(null);
+    const [categoryData, setCategoryData] = useState([]);
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
+    const [itemDesciption, setItemDesciption] = useState('');
     const [itemInstruction, setItemInstruction] = useState('');
     const [itemCategory, setItemCategory] = useState('');   
+    const [itemId, setItemId] = useState('');
     const [alertType, setAlertType] = useState(false)
     const [alertMessage, setAlertMessage] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [allItems, setAllItems] = useState([])
+    const [isTrueLoader, setIsTrueLoader] = useState(false)
     useEffect(() => {
         const textareas = document.querySelectorAll('textarea');
         textareas.forEach(textarea => {
@@ -32,17 +41,27 @@ export default function SellerItem() {
           });
         });
       }, []);
+      useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getCategory()
+                const categoryNames = response.map((category) => category.name);
+                setCategoryData(categoryNames);
+                setAllItems(response)
+                setIsTrueLoader(true)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        fetchData()
+    }, []);
       const handleFileInput = (inputId) => {
         const input = document.createElement('input');
         input.type = 'file';
       
         input.onchange = (event) => {
           const file = event.target.files[0];
-          if (inputId === 1) {
-            setSelectedFile(file);
-          } else if (inputId === 2) {
-            setSelectedFile2(file);
-          }
+          setSelectedFile(file);
         };
         input.click();
       };
@@ -51,20 +70,29 @@ export default function SellerItem() {
             showAndHideAlert()
             const formData = new FormData();
             const newPrice = parseFloat(itemPrice)
+            formData.append('productId', parseFloat(itemId))
             formData.append('name', itemName);
             formData.append('image', selectedFile);
-            formData.append('description', selectedFile2);
-            formData.append('price', newPrice);
+            formData.append('description', itemDesciption);
+            formData.append('data', selectedFile2);
+            formData.append('priceUSD', newPrice);
             formData.append('instructions', itemInstruction)
-            formData.append('category', itemCategory)
-            await putItem(formData, shopId)
+            const foundCategory = allItems.find((item) => item.name === selectedCategory);
+            if (foundCategory) {
+                const categoryId = foundCategory.id;
+                formData.append('categoryId', categoryId);
+                console.log(formData, typeof(newPrice))
+                await updateItem(formData);
+            } else {
+                console.error('Category not found');
+            }
         } catch(error) {
             console.error(error);
         }
     };
     const removeItem = async () => {
         try {
-            await deleteItem()
+            await deleteItem(itemId)
             showAndHideAlertDelete()
         } catch(error) {
             console.error(error);
@@ -88,8 +116,9 @@ export default function SellerItem() {
         let a = sessionStorage.getItem('itemData');
         if (a) {
           a = JSON.parse(a);
+          setItemId(a.id)
           setItemName(a.name);
-          setItemPrice(a.price);
+          setItemPrice(a.priceUSD);
         }
       }, []);
       
@@ -103,7 +132,7 @@ export default function SellerItem() {
         },
     });
     return (
-        <div className='setting__container'>
+        <div className='setting__container' style={{ overflow: isTrueLoader ? 'scroll' : '' }}>
             <BackBtn />
             <div className='setting__subtitle'>
                 <h1>Edit an item</h1>
@@ -128,7 +157,7 @@ export default function SellerItem() {
                     </div>
                     <div className='setting__tools-description ll'>
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter item name description..." value={selectedFile2 ? selectedFile2.name : ''} onClick={() => handleFileInput(2)}/>
+                            <textarea type="text" placeholder="Enter item name description..." value={itemDesciption} onChange={(e) => setItemDesciption(e.target.value)}/>
                             <div className="input__search">
                                 <DescriptionIcon />
                             </div>
@@ -152,11 +181,15 @@ export default function SellerItem() {
                     </div>
                     <div className='setting__tools-price ll'>
                         <div className='input'>
-                            <select value={itemCategory} onChange={(e) => setItemCategory(e.target.value)}>
-                                <option>123</option>
-                                <option>321</option>
-                                <option>231</option>
-                            </select>
+                            <Dropdown
+                                value={selectedCategory}
+                                options={categoryData}
+                                placeholder="Select a category"
+                                onChange={(e) => {
+                                    setSelectedCategory(e.value);
+                                  }}
+                                className="w-full"
+                            />
                             <div className="input__search">
                                 <DescriptionIcon />
                             </div>
@@ -171,11 +204,11 @@ export default function SellerItem() {
                     <Alert severity="success" color="info" className={`sendMain__alert-true ${alertType ? 'active' : ''}`}>
                         {alertMessage}
                     </Alert>
-                    {/* <Alert severity="success" color="info" className={`sendMain__alert-true ${alertType ? 'active' : ''}`}>
-                        Item successfully deleted
-                    </Alert> */}
                 </ThemeProvider>
             </div>    
+            <div className={isTrueLoader === false ? 'loadingModal__container active' : 'loadingModal__container'}>
+                <LoadingModal />
+            </div>
         </div>
     )
 }

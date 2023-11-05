@@ -9,12 +9,11 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Alert } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
-import { useParams } from 'react-router-dom';
 import LoadingModal from '../../../userView/components/ui/loadingModal'
 import { Dropdown } from 'primereact/dropdown';
 export default function ItemsAdd() {
-    let { shopId } = useParams()
     const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile2, setSelectedFile2] = useState(null);
     const [itemDesciption, setItemDesciption] = useState('');
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
@@ -38,15 +37,20 @@ export default function ItemsAdd() {
             });
         });
     }, []);
-    const handleFileInput = (id) => {
+    const handleFileInput = (inputId) => {
         const input = document.createElement('input');
         input.type = 'file';
+      
         input.onchange = (event) => {
-            const file = event.target.files[0];
+          const file = event.target.files[0];
+          if (inputId === 1) {
             setSelectedFile(file);
+          } else if (inputId === 2) {
+            setSelectedFile2(file);
+          }
         };
         input.click();
-    };
+      };
     const clearInput = () => {
         setItemName('');
         setSelectedFile(null);
@@ -74,6 +78,7 @@ export default function ItemsAdd() {
                 formData.append('description', itemDesciption);
                 formData.append('priceUSD', newPrice);
                 formData.append('instruction', itemInstruction);
+                formData.append('data', selectedFile2);
                 const foundCategory = allItems.find((item) => item.name === selectedCategory);
                 if (foundCategory) {
                     const categoryId = foundCategory.id;
@@ -164,6 +169,14 @@ export default function ItemsAdd() {
                             <textarea type="number" placeholder="Enter the cost of the item..." value={itemPrice} onChange={handleItemPriceChange} />
                             <div className="input__search">
                                 <AttachMoneyIcon />
+                            </div>
+                        </div>
+                    </div>
+                    <div className='setting__tools-price ll'>
+                        <div className='input'>
+                            <textarea type="text" placeholder="Enter the quantity..." readOnly value={selectedFile2 ? selectedFile2.name : ''} onClick={() => handleFileInput(2)} />
+                            <div className="input__search">
+                                <DescriptionIcon />
                             </div>
                         </div>
                     </div>

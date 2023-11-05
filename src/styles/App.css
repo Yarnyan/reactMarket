@@ -1769,13 +1769,13 @@ user */
 .filter__category {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 0 10px;
+    flex-wrap: wrap
 }
 
 .category {
-    width: 100px;
+    min-width: 100px;
     height: 40px;
     background-color: #191c21;
     border-radius: 12px;
@@ -1783,6 +1783,11 @@ user */
     justify-content: center;
     align-items: center;
     color: white;
+    margin-bottom: 10px;
+}
+
+.category:not(:first-child):not(:nth-child(4n)) {
+    margin-left: 35px;
 }
 
 .category.active {
@@ -2660,4 +2665,10 @@ user */
 
 .p-dropdown-items {
     max-height: 100px;
+}
+
+.error_response-title {
+    font-size: 26px;
+    color: #fff;
+    text-align: center;
 }

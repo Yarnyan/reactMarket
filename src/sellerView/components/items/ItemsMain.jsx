@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ItemsFilter from '../items/itemsFilter';
-import { getItems } from '../../../api/sellerReq'
+import { getProducts } from '../../../api/sellerReq'
 import LoadingModal from '../../../userView/components/ui/loadingModal'
 export default function ItemsMain(props) {
   const [newItems, setNewItems] = useState([])
@@ -15,57 +15,6 @@ export default function ItemsMain(props) {
   const handleFilterClose = () => {
     setIsFilterActive(false);
   };
-  useEffect(() => {
-    const items = [
-      {
-        id: 1,
-        img: 'https://i.pinimg.com/564x/bd/b5/d1/bdb5d111a2cbea8fb97e03a7051ac7f7.jpg',
-        name: 'Аир Джордан 9999 #1',
-        price: '400.00',
-        category: 'тапки',
-        sales: '10',
-        availability: '100',
-      },
-      {
-        id: 2,
-        img: 'https://i.pinimg.com/564x/90/46/be/9046be978a30b27f79a1db6cbbe56168.jpg',
-        name: 'Аир Джордан 9999 #1',
-        price: '400.00',
-        category: 'боты',
-        sales: '10',
-        availability: '100',
-      },
-      {
-        id: 3,
-        img: 'https://i.pinimg.com/564x/90/46/be/9046be978a30b27f79a1db6cbbe56168.jpg',
-        name: 'Аир Джордан 9999 #1',
-        price: '400.00',
-        category: 'бананы',
-        sales: '10',
-        availability: '100',
-      },
-      {
-        id: 4,
-        img: 'https://i.pinimg.com/564x/90/46/be/9046be978a30b27f79a1db6cbbe56168.jpg',
-        name: 'Аир Джордан 9999 #1',
-        price: '400.00',
-        category: 'тапки',
-        sales: '10',
-        availability: '100',
-      },
-      {
-        id: 5,
-        img: 'https://i.pinimg.com/564x/90/46/be/9046be978a30b27f79a1db6cbbe56168.jpg',
-        name: 'Аир Джордан 9999 #1',
-        price: '400.00',
-        category: 'тапки',
-        sales: '10',
-        availability: '100',
-      },
-    ]
-    setNewItems(items)
-    setFilteredItems(items);
-  }, []);
   const handleFilterClick = () => {
     setIsFilterActive(true);
   };
@@ -85,7 +34,8 @@ export default function ItemsMain(props) {
       const minPrice = parseFloat(priceFrom);
       const maxPrice = parseFloat(priceTo);
       filtered = filtered.filter(item => {
-        const itemPrice = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+        console.log(item.priceUSD)
+        const itemPrice = parseFloat(item.priceUSD);
         return itemPrice >= minPrice && itemPrice <= maxPrice;
       });
     }
@@ -94,7 +44,7 @@ export default function ItemsMain(props) {
       const minSales = parseInt(salesFrom);
       const maxSales = parseInt(salesTo);
       filtered = filtered.filter(item => {
-        const itemSales = parseInt(item.sales.replace(/[^0-9]/g, ''));
+        const itemSales = parseInt(item.sales);
         return itemSales >= minSales && itemSales <= maxSales;
       });
     }
@@ -108,10 +58,12 @@ export default function ItemsMain(props) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        await getItems(shopId)
+        let response = await getProducts(shopId)
+        setNewItems(response)
+        setFilteredItems(response);
         setIsTrueLoader(true);
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
     }
     fetchSettings()
@@ -125,29 +77,38 @@ export default function ItemsMain(props) {
         <button onClick={handleFilterClick}>Filter</button>
         <KeyboardArrowDownIcon />
       </div>
-      <div className='shopSeller__container-items'>
-        {filteredItems.map((item, index) => {
-          return (
-            <Link to={`/shopSeller/${shopId}/items/${item.id}`} className='shopSeller__items-item' key={item.id} onClick={() => handleItemClick(item)}>
-              <div className='shopSeller__item-image'>
-                <img src={item.img} />
-              </div>
-              <div className='shopSeller__item-info'>
-                <p>{item.name}</p>
-                <p>$ {item.price}</p>
-                <p>{item.category}</p>
-                <p style={{ color: 'gray' }}>{item.sales}</p>
-                <p style={{ color: 'gray' }}>{item.availability}</p>
-              </div>
-            </Link>
-          )
-        })}
-        <Link className='add__btn' to={`/shopSeller/${shopId}/add`}>
-          <AddIcon />
-        </Link>
-      </div>
+      {filteredItems.length === 0 ? (
+        <p className='error_response-title'>Goods are missing</p>
+      ) : (
+        <div className='shopSeller__container-items'>
+          {filteredItems.map((item, index) => {
+            return (
+              <Link 
+                to={`/shopSeller/${shopId}/items/${item.id}`}
+                className='shopSeller__items-item'
+                key={item.id}
+                onClick={() => handleItemClick(item)}
+              >
+                <div className='shopSeller__item-image'>
+                  <img src={item.category.imageUrl} />
+                </div>
+                <div className='shopSeller__item-info'>
+                  <p>{item.name}</p>
+                  <p>${item.priceUSD}</p>
+                  <p style={{'wordBreak': 'break-all'}}>Category: {item.category.name}</p>
+                  <p style={{ color: 'gray' }}>Sales: {item.sales}</p>
+                  <p style={{ color: 'gray' }}>Count: {item.count}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+      <Link className='add__btn' to={`/shopSeller/${shopId}/add`}>
+        <AddIcon />
+      </Link>
       <div className={`filter__modal ${isFilterActive ? 'active' : ''}`}>
-        <ItemsFilter item={newItems} isActive={isFilterActive} onFilterClose={handleFilterClose} onFilterApply={applyFilters} allCategories={allCategories} />
+      <ItemsFilter item={newItems} isActive={isFilterActive} onFilterClose={handleFilterClose} onFilterApply={applyFilters} allCategories={allCategories} />
       </div>
       <div className={isTrueLoader === false ? 'loadingModal__container active' : 'loadingModal__container'}>
         <LoadingModal />

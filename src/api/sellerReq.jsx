@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const apiLink = 'https://7a5c-31-28-113-222.ngrok-free.app/api'
+const apiLink = 'https://a15a-31-28-113-222.ngrok-free.app/api'
 const b = sessionStorage.getItem('auth-token')
 const POST = async (link, params, data) => {
   let c = params === undefined ? ' ' : '?' + params;
@@ -44,6 +44,7 @@ async function GET(link, params) {
         'Access-Control-Allow-Origin': '*'
       }
     })
+    console.log(a.data)
     return a.data;
   } catch (error) {
     return error
@@ -66,7 +67,7 @@ async function DELETE(link, params) {
 }
 
 export function updateSetting(formData) {
-  return PUT('/Shop/update', undefined, formData)
+  return PUT('/Shop/updateShop', undefined, formData)
 } //good
 
 export function addItem(formData) {
@@ -74,12 +75,20 @@ export function addItem(formData) {
 } //good
 
 export function deleteItem(productId) {
-  return DELETE('Product/removeProduct', 'categoryId=' + productId)
+  return DELETE('/Product/removeProduct', 'productId=' + productId)
 }
 
 export async function getShop(shopId) {
-  return await GET(`/Shop/getById`, "id=" + shopId)
+  return await GET(`/Shop/getShopById`, "id=" + shopId)
 } //good
+
+export async function getProducts(shopId) {
+  return await GET(`/Product/getProducts`, "shopId=" + shopId)
+} //good
+
+export async function updateItem(formData) {
+  return await PUT('/Product/editProduct', undefined, formData)
+}
 
 // /ne testil
 export function putSetting(formData, shopId) {
