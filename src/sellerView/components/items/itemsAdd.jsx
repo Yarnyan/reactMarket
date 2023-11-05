@@ -3,7 +3,7 @@ import BackBtn from '../../../shopView/components/ui/Button/BackButton'
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PhotoIcon from '@mui/icons-material/Photo';
-import { postNewItem } from '../../../api/sellerReq'
+import { addItem } from '../../../api/sellerReq'
 import { getCategory } from '../../../api/shopReq'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Alert } from '@mui/material';
@@ -72,11 +72,18 @@ export default function ItemsAdd() {
                 formData.append('name', itemName);
                 formData.append('image', selectedFile);
                 formData.append('description', itemDesciption);
-                formData.append('price', itemPrice);
-                formData.append('instructions', itemInstruction);
-                // formData.append('category', selectedCategoryId);
-                clearInput()
-                await postNewItem(formData, shopId)
+                formData.append('priceUSD', newPrice);
+                formData.append('instruction', itemInstruction);
+                const foundCategory = allItems.find((item) => item.name === selectedCategory);
+                if (foundCategory) {
+                    const categoryId = foundCategory.id;
+                    formData.append('categoryId', categoryId);
+                    clearInput();
+                    console.log(formData, typeof(newPrice))
+                    await addItem(formData);
+                } else {
+                    console.error('Category not found');
+                }
             }
         } catch (error) {
             console.error(error);
@@ -111,6 +118,14 @@ export default function ItemsAdd() {
         }
         fetchData()
     }, []);
+    const handleItemPriceChange = (e) => {
+        const inputValue = e.target.value;
+
+        const regex = /^[0-9]*\.?[0-9]*$/;
+        if (regex.test(inputValue)) {
+            setItemPrice(inputValue);
+        }
+    };
     return (
         <div className='setting__container' style={{ overflow: isTrueLoader ? 'scroll' : '' }}>
             <BackBtn />
@@ -129,7 +144,7 @@ export default function ItemsAdd() {
                     </div>
                     <div className='setting__tools-file ll'>
                         <div className='input'>
-                            <textarea type="text" placeholder="Add a store photo..." value={selectedFile ? selectedFile.name : ''} onClick={() => handleFileInput(1)} />
+                            <textarea type="text" placeholder="Add a store photo..." readOnly value={selectedFile ? selectedFile.name : ''} onClick={() => handleFileInput(1)} />
                             <div className="input__search">
                                 <PhotoIcon />
                             </div>
@@ -146,7 +161,7 @@ export default function ItemsAdd() {
                     </div>
                     <div className='setting__tools-price ll'>
                         <div className='input'>
-                            <textarea type="text" placeholder="Enter the cost of the item..." value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                            <textarea type="number" placeholder="Enter the cost of the item..." value={itemPrice} onChange={handleItemPriceChange} />
                             <div className="input__search">
                                 <AttachMoneyIcon />
                             </div>

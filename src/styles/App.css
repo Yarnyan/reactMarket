@@ -2640,12 +2640,16 @@ user */
     height: 50px;
     font-size: 14px;
     padding: 10px;
-    color: gray;
+    color: #fff;
     background-color: #141516;
     border-radius: 0 12px 12px 0;
     width: 100%;
     resize: none;
     overflow: hidden;
+}
+
+.p-placeholder {
+    color: gray;
 }
 
 .p-dropdown-item {
